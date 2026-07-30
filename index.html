@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Copiloto de Inovação — Protótipo</title>
+  <style>
+    :root{
+      --navy:#1F3864;
+      --blue:#2E75B6;
+      --blue-soft:#EAF1FA;
+      --ink:#1C2A3A;
+      --muted:#5B6B7C;
+      --bg:#F5F7FA;
+      --card:#FFFFFF;
+      --line:#E2E8F0;
+      --ok:#1E8E5A;
+      --warn:#C9821A;
+      --bad:#C0392B;
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+      color:var(--ink);
+      background:var(--bg);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;padding:0;min-height:100vh}
+    header{background:linear-gradient(180deg,rgba(255,255,255,.6),transparent);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+    .container{max-width:980px;margin:0 auto;padding:18px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:42px;height:42px;background:var(--navy);border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+    h1{font-size:20px;margin:0}
+    .selo{background:var(--blue-soft);color:var(--navy);padding:4px 8px;border-radius:10px;font-weight:600;font-size:12px}
+
+    /* Tabs */
+    nav.tabs{display:flex;gap:12px;margin-top:14px}
+    nav button{background:transparent;border:0;padding:10px 6px;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;cursor:pointer}
+    nav button.active{color:var(--navy);border-bottom-color:var(--blue)}
+
+    main{padding:18px}
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:18px}
+    @media(max-width:880px){.grid{grid-template-columns:1fr} .right-col{order:2}}
+
+    /* Card */
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 8px 24px rgba(16,32,55,.06)}
+    .card + .card{margin-top:12px}
+    .card h3{margin:0 0 6px;font-size:15px}
+    .muted{color:var(--muted);font-size:13px}
+
+    /* Buttons */
+    .btn{display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:8px 12px;font-weight:700;border:0;cursor:pointer}
+    .btn-primary{background:var(--navy);color:#fff}
+    .btn-ghost{background:#fff;color:var(--navy);border:1px solid var(--line)}
+    .btn-danger{background:var(--bad);color:#fff}
+
+    /* Form */
+    label{display:block;font-size:13px;margin-bottom:6px;color:var(--muted)}
+    input[type=text], textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff}
+    textarea{min-height:96px;resize:vertical}
+
+    .cards-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+    .tags{display:flex;gap:8px;margin-top:8px}
+    .tag{padding:6px 8px;border-radius:999px;font-weight:600;font-size:12px}
+    .tag.ok{background:rgba(30,142,90,.12);color:var(--ok)}
+    .tag.warn{background:rgba(201,130,26,.10);color:var(--warn)}
+n    /* My ideas list */
+    .idea-actions{display:flex;gap:8px;margin-top:8px}
+    .empty{padding:36px;text-align:center;color:var(--muted)}
+    footer{padding:18px;text-align:center;color:var(--muted);font-size:13px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="brand">
+        <div class="logo">CI</div>
+        <div>
+          <h1>Copiloto de Inovação <span class="selo">Protótipo</span></h1>
+          <div class="muted">Geração de desafios, ideias e portfólio local</div>
+        </div>
+      </div>
+      <nav class="tabs" style="margin-bottom:6px">
+        <button id="tab-explorar" class="active">Explorar desafios</button>
+        <button id="tab-gerar">Gerar ideias</button>
+        <button id="tab-minhas">Minhas ideias <span id="counter" style="margin-left:8px;font-weight:600;color:var(--navy)"></span></button>
+      </nav>
+    </div>
+  </header>
+  <main class="container">
+    <div class="grid">
+      <section class="left-col">
+        <div id="view-explorar" class="card"> <!-- Explorar -->
+          <h2>Explorar desafios</h2>
+          <p class="muted">Digite uma área ou tema para gerar desafios e oportunidades.</p>
+          <div style="margin-top:12px;display:flex;gap:8px">
+            <input id="tema" type="text" placeholder="Ex.: embalagens sustentáveis" />
+            <button id="btn-gerar-desafios" class="btn btn-primary">Gerar desafios</button>
+          </div>
+          <div id="desafios" style="margin-top:16px"></div>
+        </div>
+
+        <div id="view-gerar" class="card" style="display:none"> <!-- Gerar ideias -->
+          <h2>Gerar ideias de solução</h2>
+          <p class="muted">Preencha o formulário e gere ideias acionáveis.</p>
+          <div style="margin-top:12px">
+            <label>Desafio / Problema (obrigatório)</label>
+            <input id="form-desafio" type="text" />
+            <label style="margin-top:10px">Área / Contexto</label>
+            <input id="form-area" type="text" />
+            <label style="margin-top:10px">Público-alvo</label>
+            <input id="form-publico" type="text" />
+            <label style="margin-top:10px">Restrições (opcional)</label>
+            <textarea id="form-restricoes"></textarea>
+            <div style="margin-top:12px">
+              <button id="btn-gerar-ideias" class="btn btn-primary">Gerar ideias de solução</button>
+              <button id="btn-limpar-form" class="btn btn-ghost">Limpar</button>
+            </div>
+          </div>
+          <div id="ideias-geradas" style="margin-top:16px"></div>
+        </div>
+
+        <div id="view-minhas" class="card" style="display:none"> <!-- Minhas ideias -->
+          <h2>Minhas ideias</h2>
+          <div id="minhas-ideias-list" style="margin-top:12px"></div>
+        </div>
+      </section>
+
+      <aside class="right-col"> <!-- Sidebar com dicas e instruções -->
+        <div class="card">
+          <h3>Como funciona</h3>
+          <p class="muted">Fluxo: gerar desafios → gerar ideias → salvar ideias. Os dados ficam apenas no navegador (localStorage).</p>
+        </div>
+        <div class="card" style="margin-top:12px">
+          <h3>Modo IA</h3>
+          <p class="muted">A função chamarIA(tipo, contexto) devolve dados mock por enquanto. No futuro será conectada ao OpenRouter com chave guardada em sessionStorage.</p>
+        </div>
+      </aside>
+    </div>
+  </main>
+  <footer>
+    Protótipo — dados locais no navegador • Idioma: Português (BR)
+  </footer>
+
+  <script>
+    // Persistência: localStorage com fallback em memória    
+    const STORAGE_KEY = 'copiloto_ideias_v1';
+    let memoryStore = { ideas: [] };
+    function loadStore(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(raw) return JSON.parse(raw);
+        return memoryStore;
+      }catch(e){
+        return memoryStore;
+      }
+    }
+    function saveStore(store){
+      try{
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+      }catch(e){
+        memoryStore = store; // fallback
+      }
+    }
+
+    // Única função que centraliza geração (mock por enquanto)
+    function chamarIA(tipo, contexto){
+      // tipo: 'desafios' | 'ideias'
+      if(tipo === 'desafios'){
+        const tema = contexto.tema || 'tema genérico';
+        // gerar 4 a 6 desafios mock
+        const n = 4 + Math.floor(Math.random()*3);
+        const items = Array.from({length:n}).map((_,i)=>({
+          id: 'd-'+Date.now()+'-'+i,
+          titulo: `${capitalize(tema)} — desafio ${i+1}`,
+          descricao: `Descrição curta do desafio ${i+1} relacionada a ${tema}.`,
+          porQue: `Importância: resolver isso melhora a experiência do público e reduz custos.`
+        }));
+        return Promise.resolve(items);
+      }
+      if(tipo === 'ideias'){
+        const n = 3 + Math.floor(Math.random()*3); // 3 a 5 ideias
+        const items = Array.from({length:n}).map((_,i)=>({
+          id: 'i-'+Date.now()+'-'+i,
+          titulo:`Ideia ${i+1} para ${contexto.desafio.slice(0,30)}`,
+          descricao:`Descrição da ideia ${i+1}, explicando a proposta e principais benefícios.`,
+          primeirosPassos:`1) Mapear stakeholders. 2) Prototipar solução mínima. 3) Testar com 5 usuários.`,
+          impacto: ['Alto','Médio','Baixo'][Math.floor(Math.random()*3)],
+          esforco: ['Baixo','Médio','Alto'][Math.floor(Math.random()*3)]
+        }));
+        return Promise.resolve(items);
+      }
+      return Promise.resolve([]);
+    }
+
+    // Helpers    
+    function capitalize(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+
+    // UI: tabs    
+    const tabExplorar = document.getElementById('tab-explorar');
+    const tabGerar = document.getElementById('tab-gerar');
+    const tabMinhas = document.getElementById('tab-minhas');
+    const viewExplorar = document.getElementById('view-explorar');
+    const viewGerar = document.getElementById('view-gerar');
+    const viewMinhas = document.getElementById('view-minhas');
+    function switchTo(tab){
+      [tabExplorar,tabGerar,tabMinhas].forEach(b=>b.classList.remove('active'));
+      [viewExplorar,viewGerar,viewMinhas].forEach(v=>v.style.display='none');
+      if(tab==='explorar'){tabExplorar.classList.add('active');viewExplorar.style.display='block'}
+      if(tab==='gerar'){tabGerar.classList.add('active');viewGerar.style.display='block'}
+      if(tab==='minhas'){tabMinhas.classList.add('active');viewMinhas.style.display='block'}
+    }
+    tabExplorar.addEventListener('click',()=>switchTo('explorar'));
+    tabGerar.addEventListener('click',()=>switchTo('gerar'));
+    tabMinhas.addEventListener('click',()=>switchTo('minhas'));
+
+    // Explorar: gerar desafios
+    const btnGerarDesafios = document.getElementById('btn-gerar-desafios');
+    const temaInput = document.getElementById('tema');
+    const desafiosEl = document.getElementById('desafios');
+    btnGerarDesafios.addEventListener('click', ()=>{
+      const tema = (temaInput.value || '').trim();
+      if(!tema){temaInput.focus();return}
+      desafiosEl.innerHTML = '<div class="muted">Gerando...</div>';
+      chamarIA('desafios',{tema}).then(items=>{
+        renderDesafios(items);
+      })
+    });
+    function renderDesafios(items){
+      if(!items || items.length===0){desafiosEl.innerHTML = '<div class="muted">Nenhum desafio gerado.</div>';return}
+      const wrap = document.createElement('div'); wrap.className='cards-list';
+      items.forEach(it=>{
+        const c = document.createElement('div'); c.className='card';
+        c.innerHTML = `<h3>${esc(it.titulo)}</h3><div class="muted">${esc(it.descricao)}</div><p style="margin-top:8px;font-size:13px"><strong>Por que importa:</strong> ${esc(it.porQue)}</p>`;
+        const btn = document.createElement('button'); btn.className='btn btn-ghost'; btn.textContent='Gerar ideias para este desafio';
+        btn.addEventListener('click', ()=>{
+          switchTo('gerar');
+          document.getElementById('form-desafio').value = it.titulo;
+          document.getElementById('form-area').value = temaInput.value || '';
+          window.scrollTo({top:0,behavior:'smooth'});
+        });
+        c.appendChild(btn);
+        wrap.appendChild(c);
+      });
+      desafiosEl.innerHTML=''; desafiosEl.appendChild(wrap);
+    }
+
+    // Gerar ideias    
+    const btnGerarIdeias = document.getElementById('btn-gerar-ideias');
+    const btnLimparForm = document.getElementById('btn-limpar-form');
+    const ideiasGeradasEl = document.getElementById('ideias-geradas');
+    btnGerarIdeias.addEventListener('click', ()=>{
+      const desafio = document.getElementById('form-desafio').value.trim();
+      if(!desafio){alert('O campo "Desafio / Problema" é obrigatório.');return}
+      const contexto = {
+        desafio,
+        area: document.getElementById('form-area').value.trim(),
+        publico: document.getElementById('form-publico').value.trim(),
+        restricoes: document.getElementById('form-restricoes').value.trim()
+      };
+      ideiasGeradasEl.innerHTML = '<div class="muted">Gerando ideias...</div>';
+      chamarIA('ideias', contexto).then(items=>{
+        renderIdeiasGeradas(items);
+      })
+    });
+    btnLimparForm.addEventListener('click', ()=>{
+      document.getElementById('form-desafio').value='';
+      document.getElementById('form-area').value='';
+      document.getElementById('form-publico').value='';
+      document.getElementById('form-restricoes').value='';
+      ideiasGeradasEl.innerHTML='';
+    })
+
+    function renderIdeiasGeradas(items){
+      if(!items || items.length===0){ideiasGeradasEl.innerHTML='<div class="muted">Nenhuma ideia gerada.</div>';return}
+      const wrap = document.createElement('div'); wrap.className='cards-list';
+      items.forEach(it=>{
+        const c = document.createElement('div'); c.className='card';
+        c.innerHTML = `<h3>${esc(it.titulo)}</h3><div class="muted">${esc(it.descricao)}</div><p style="margin-top:8px"><strong>Primeiros passos:</strong> ${esc(it.primeirosPassos)}</p>`;
+        const tags = document.createElement('div'); tags.className='tags';
+        const t1 = document.createElement('div'); t1.className='tag ok'; t1.textContent = 'Impacto: '+it.impacto; tags.appendChild(t1);
+        const t2 = document.createElement('div'); t2.className='tag warn'; t2.textContent = 'Esforço: '+it.esforco; tags.appendChild(t2);
+        c.appendChild(tags);
+        const btn = document.createElement('button'); btn.className='btn btn-primary'; btn.textContent='Salvar ideia';
+        btn.addEventListener('click', ()=>{
+          saveIdea(it);
+        });
+        c.appendChild(btn);
+        wrap.appendChild(c);
+      });
+      ideiasGeradasEl.innerHTML=''; ideiasGeradasEl.appendChild(wrap);
+    }
+
+    // Salvar / editar / excluir ideias
+    function saveIdea(idea){
+      const store = loadStore();
+      const exists = store.ideas.find(x=>x.id===idea.id);
+      if(!exists){store.ideas.unshift(idea); saveStore(store); renderMinhas(); alert('Ideia salva!');}
+      else{alert('Essa ideia já está salva.');}
+    }
+    function renderMinhas(){
+      const listEl = document.getElementById('minhas-ideias-list');
+      const store = loadStore();
+      const arr = store.ideas || [];
+      document.getElementById('counter').textContent = `(${arr.length})`;
+      if(arr.length===0){listEl.innerHTML = `<div class="empty">Você ainda não salvou ideias. Salve ideias a partir da aba Gerar ideias.</div>`;return}
+      const wrap = document.createElement('div');
+      arr.forEach(it=>{
+        const c = document.createElement('div'); c.className='card';
+        const html = `<h3 contenteditable="false" data-id="${it.id}" class="idea-title">${esc(it.titulo)}</h3><div class="muted idea-desc">${esc(it.descricao)}</div>`;
+        c.innerHTML = html;
+        const actions = document.createElement('div'); actions.className='idea-actions';
+        const btnEdit = document.createElement('button'); btnEdit.className='btn btn-ghost'; btnEdit.textContent='Editar';
+        const btnSave = document.createElement('button'); btnSave.className='btn btn-primary'; btnSave.textContent='Salvar alterações'; btnSave.style.display='none';
+        const btnDelete = document.createElement('button'); btnDelete.className='btn btn-danger'; btnDelete.textContent='Excluir';
+        btnEdit.addEventListener('click', ()=>{
+          const title = c.querySelector('.idea-title'); const desc = c.querySelector('.idea-desc');
+          title.contentEditable = true; desc.contentEditable = true; title.focus(); btnSave.style.display='inline-flex';
+        });
+        btnSave.addEventListener('click', ()=>{
+          const title = c.querySelector('.idea-title').textContent.trim();
+          const desc = c.querySelector('.idea-desc').textContent.trim();
+          const store = loadStore();
+          const idx = store.ideas.findIndex(x=>x.id===it.id);
+          if(idx>-1){store.ideas[idx].titulo = title; store.ideas[idx].descricao = desc; saveStore(store); renderMinhas(); alert('Alterações salvas.');}
+        });
+        btnDelete.addEventListener('click', ()=>{
+          if(!confirm('Excluir ideia?')) return;
+          const store = loadStore(); store.ideas = store.ideas.filter(x=>x.id!==it.id); saveStore(store); renderMinhas();
+        });
+        actions.appendChild(btnEdit); actions.appendChild(btnSave); actions.appendChild(btnDelete);
+        c.appendChild(actions);
+        wrap.appendChild(c);
+      });
+      listEl.innerHTML=''; listEl.appendChild(wrap);
+    }
+
+    // Utility: escape minimal    
+    function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+    // Inicialização    
+    (function init(){
+      renderMinhas();
+      switchTo('explorar');
+    })();
+  </script>
+</body>
+</html>
